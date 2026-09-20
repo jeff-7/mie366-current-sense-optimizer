@@ -55,8 +55,7 @@ Nominal maximum endpoint error: approximately **0.236 mV**.
 
 ## Interactive Falstad Models
 
-- [Candidate 1](https://www.falstad.com/s.php?s=Vyss9r)
-- [Candidate 2](https://www.falstad.com/s.php?s=RiAqLA)
+- [Circuit Schematic](https://www.falstad.com/s.php?s=RiAqLA)
 
 ## Notes
 
