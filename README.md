@@ -1,64 +1,103 @@
 # MIE366 Current-Sense Resistor Optimizer
 
-This repository contains the numerical resistor-selection tool and
-supporting files developed for MIE366 Design Assignment 1 at the
-University of Toronto.
+Supporting files for the **Candidate 2 buffered weighted-summing current-sense circuit** used in MIE366 Design Assignment 1.
+
+## Circuit
+
+![Candidate 2 current-sense circuit](circuit.svg)
+
+Interactive Falstad model: [Open Candidate 2](https://www.falstad.com/s.php?s=RiAqLA)
 
 ## Design Target
 
-The current-sense circuit is designed to approximate
+The circuit is designed to approximate
 
-\[
-V_{OUT} = 8.714 V_{SENSE} + 0.25
-\]
+$$
+V_{\mathrm{OUT}} = 8.714\,V_{\mathrm{SENSE}} + 0.25
+$$
 
-with:
+Design constraints used by the optimizer:
 
-- \(R_{SENSE} = 0.1 \Omega\)
-- \(I_{LOAD} = 0\) to \(3.5\text{ A}\)
-- \(V_{SENSE} = 0\) to \(0.35\text{ V}\)
-- \(V_{OUT} = 0.25\) to \(3.3\text{ V}\)
-- Standard E24 5% resistor values
-- Ordinary resistors restricted to 1 kΩ to 100 kΩ
+- Sense resistor: **0.1 Ω**
+- Load-current range: **0–3.5 A**
+- Sense-voltage range: **0–0.35 V**
+- Output-voltage target: **0.25–3.3 V**
+- Ordinary resistors: **E24, 5% nominal values**
+- Ordinary resistor range: **1 kΩ–100 kΩ**
+- Op-amp supply: **+19 V / 0 V**
+
+## Candidate 2 Topology
+
+The optimized circuit uses three functional blocks:
+
+1. a resistor divider to generate a positive reference voltage;
+2. a voltage follower to buffer the reference;
+3. a weighted-summing non-inverting stage to set the gain and offset.
+
+The resistor naming used in the script is:
+
+- `R1`: VREF node to ground
+- `R2`: +19 V to VREF node
+- `R3`: VSENSE to weighted-summing node
+- `R4`: buffered VREF to weighted-summing node
+- `Rg`: inverting input to ground
+- `Rf`: VOUT to inverting input
+- `Rsense`: current-sense resistor
 
 ## Optimization Method
 
-The Python script:
+`resistor_optimizer.py` searches permitted E24 resistor ratios and evaluates each retained design using two criteria:
 
-1. Generates permitted E24 resistor values.
-2. Removes electrically duplicate resistor-ratio combinations.
-3. Evaluates the nominal circuit transfer function.
-4. Calculates maximum endpoint error.
-5. Evaluates all \(2^7 = 128\) tolerance corners for the six ordinary
-   resistors and the current-sense resistor.
-6. Ranks candidate resistor configurations.
+- **Nominal maximum endpoint error** at 0 A and 3.5 A.
+- **Worst-case tolerance error** using all $2^7 = 128$ upper/lower tolerance corners for the six ordinary resistors and `Rsense`.
 
-## Selected Configuration
+No probability distribution is assumed for the tolerance analysis.
+
+## Selected Nominal Configuration
 
 | Component | Value |
 |---|---:|
-| Rsense | 0.1 Ω |
-| R1 | 2.4 kΩ |
-| R2 | 91 kΩ |
-| R3 | 3 kΩ |
-| R4 | 51 kΩ |
-| Rg | 6.2 kΩ |
-| Rf | 51 kΩ |
+| `Rsense` | 0.1 Ω |
+| `R1` | 2.4 kΩ |
+| `R2` | 91 kΩ |
+| `R3` | 3 kΩ |
+| `R4` | 51 kΩ |
+| `Rg` | 6.2 kΩ |
+| `Rf` | 51 kΩ |
 
-Nominal maximum endpoint error: approximately **0.236 mV**.
+Nominal maximum endpoint error: **0.236 mV**.
 
-## Repository Contents
+## Running the Optimizer
 
-- `resistor_optimizer_v2.py` — optimization script
-- `results/` — generated ranking tables
-- `schematics/` — candidate and final circuit schematics
+Requirements:
 
-## Interactive Falstad Models
+```bash
+pip install numpy
+```
 
-- [Circuit Schematic](https://www.falstad.com/s.php?s=RiAqLA)
+Run:
 
-## Notes
+```bash
+python3 resistor_optimizer.py --top 10 --output-dir results
+```
 
-This repository is provided as supporting material for the design report.
-The report contains the engineering analysis; this repository provides
-the computational implementation and reproducibility files.
+Generated files:
+
+- `results/theoretical_best.csv`
+- `results/robust_best.csv`
+- `results/analysis.json`
+
+## Repository Layout
+
+```text
+.
+├── README.md
+├── circuit.svg
+├── resistor_optimizer.py
+└── results/
+    ├── theoretical_best.csv
+    ├── robust_best.csv
+    └── analysis.json
+```
+
+The report contains the engineering justification; this repository provides the computational implementation and reproducibility files for Candidate 2.
