@@ -93,6 +93,7 @@ Generated files:
 .
 ├── README.md
 ├── circuit.svg
+├── schematic.pdf
 ├── resistor_optimizer.py
 └── results/
     ├── theoretical_best.csv
